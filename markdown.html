@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마크다운 완전정복</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent: #7C6EE6;
+  --accent-light: #EDE9FF;
+  --bg: #F7F6FC;
+  --card-bg: #FFFFFF;
+  --code-bg: #EEECF8;
+  --text: #1A1829;
+  --text-muted: #6B6784;
+  --border: #E2DFEF;
+  --blue: #3B82F6;
+  --amber: #D97706;
+  --green: #059669;
+  --red: #DC2626;
+  --shadow: 0 2px 12px rgba(124,110,230,0.08);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+.container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg, #6C5CE7 0%, #9B59B6 100%);
+  color: #fff;
+  padding: 56px 20px 48px;
+  text-align: center;
+}
+header h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+header p { font-size: 1.05rem; opacity: 0.88; margin-bottom: 28px; }
+.header-filename {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 500;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  padding: 4px 12px;
+  margin-bottom: 12px !important;
+  opacity: 1 !important;
+  letter-spacing: 0.01em;
+}
+.header-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.header-btn {
+  display: inline-block;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.header-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+.btn-primary { background: #fff; color: var(--accent); }
+.btn-secondary { background: rgba(255,255,255,0.18); color: #fff; border: 1.5px solid rgba(255,255,255,0.5); }
+
+/* ── SECTION TITLES ── */
+.section-wrap { padding: 60px 0 16px; }
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.section-title span { color: var(--accent); }
+.section-sub { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 28px; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 7px 16px;
+  border: 1.5px solid var(--border);
+  background: var(--card-bg);
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-title {
+  padding: 14px 20px 12px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.card-body {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 20px minmax(0,1fr);
+  min-height: 80px;
+}
+.card-left, .card-right { padding: 16px 20px; }
+.card-left { background: #FAFAF8; }
+.card-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 700;
+  writing-mode: vertical-rl;
+  letter-spacing: 4px;
+}
+.card-divider::after { content: "→"; writing-mode: horizontal-tb; font-size: 14px; letter-spacing: 0; }
+.panel-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.card-tip {
+  padding: 10px 20px;
+  background: var(--accent-light);
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: #5547C0;
+}
+.card-tip::before { content: "💡 "; }
+
+/* ── SYNTAX HIGHLIGHT ── */
+.syn { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.8; white-space: pre-wrap; }
+.syn .s-blue   { color: var(--blue); font-weight: 600; }
+.syn .s-amber  { color: var(--amber); font-weight: 600; }
+.syn .s-green  { color: var(--green); font-weight: 600; }
+.syn .s-red    { color: var(--red); font-weight: 600; }
+.syn .s-plain  { color: var(--text); }
+
+/* ── RENDERED RESULT ── */
+.rendered { font-size: 0.9rem; line-height: 1.7; }
+.rendered h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+.rendered h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+.rendered h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+.rendered h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+.rendered strong { font-weight: 700; }
+.rendered em { font-style: italic; }
+.rendered del { text-decoration: line-through; color: var(--text-muted); }
+.rendered mark { background: #FEF08A; padding: 1px 3px; border-radius: 2px; }
+.rendered ul, .rendered ol { padding-left: 20px; margin: 4px 0; }
+.rendered li { margin: 2px 0; }
+.rendered code { font-family: 'JetBrains Mono', monospace; background: var(--code-bg); padding: 2px 5px; border-radius: 4px; font-size: 0.82rem; color: #5547C0; }
+.rendered pre { background: var(--code-bg); border-radius: 8px; padding: 14px 16px; overflow-x: auto; margin: 6px 0; }
+.rendered pre code { background: none; padding: 0; color: var(--text); font-size: 0.82rem; }
+.rendered a { color: var(--accent); text-decoration: underline; }
+.rendered blockquote { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--text-muted); margin: 6px 0; font-style: italic; }
+.rendered hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+.rendered table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+.rendered th, .rendered td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+.rendered th { background: var(--code-bg); font-weight: 600; }
+.rendered input[type="checkbox"] { accent-color: var(--accent); margin-right: 6px; }
+
+/* Wikilinks in rendered */
+.rendered .wiki-link { color: #7C6EE6; text-decoration: underline dotted; cursor: pointer; }
+.rendered .md-tag { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; margin: 1px 2px; }
+.rendered .obs-embed { display: inline-flex; align-items: center; gap: 6px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; color: var(--text-muted); }
+
+/* Callouts */
+.callout { border-radius: 8px; padding: 12px 16px; margin: 6px 0; border-left: 4px solid; }
+.callout-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.callout-body { font-size: 0.85rem; }
+.callout-note, .callout-info { background: #EFF6FF; border-color: #3B82F6; }
+.callout-note .callout-title, .callout-info .callout-title { color: #1D4ED8; }
+.callout-tip, .callout-success { background: #F0FDF4; border-color: #22C55E; }
+.callout-tip .callout-title, .callout-success .callout-title { color: #15803D; }
+.callout-warning { background: #FFFBEB; border-color: #F59E0B; }
+.callout-warning .callout-title { color: #B45309; }
+.callout-danger { background: #FEF2F2; border-color: #EF4444; }
+.callout-danger .callout-title { color: #B91C1C; }
+
+/* Checkbox states */
+.task-done { text-decoration: line-through; color: var(--text-muted); }
+.task-inprogress { color: #D97706; }
+
+/* ── OBSIDIAN PREVIEW ELEMENTS ── */
+.obs-wikilink { color: #7C6EE6; text-decoration: underline dotted; font-weight: 500; cursor: pointer; }
+.obs-embed-box { background: var(--code-bg); border: 1px dashed var(--border); border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.img-placeholder { display: flex; align-items: center; gap: 8px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text-muted); font-size: 0.85rem; }
+
+/* ── LIVE EDITOR ── */
+#practice { padding: 0 0 80px; }
+.editor-wrap {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr;
+  min-height: 500px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  background: var(--card-bg);
+}
+.editor-pane, .preview-pane { display: flex; flex-direction: column; }
+.pane-header {
+  padding: 10px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pane-dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-edit { background: #FBBF24; }
+.dot-preview { background: #34D399; }
+#md-input {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.75;
+  padding: 20px;
+  border: none;
+  outline: none;
+  background: #FAFAF8;
+  color: var(--text);
+  resize: none;
+  transition: background 0.6s;
+}
+#md-preview {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: var(--card-bg);
+}
+.editor-divider {
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 540px) {
+  header h1 { font-size: 1.7rem; }
+  .card-body {
+    grid-template-columns: 1fr;
+  }
+  .card-divider { display: none; }
+  .card-left { border-bottom: 1px solid var(--border); }
+  .editor-wrap { grid-template-columns: 1fr; grid-template-rows: 1fr 20px 1fr; }
+  .editor-divider { writing-mode: horizontal-tb; }
+}
+
+/* ── TRY BUTTON ── */
+.card-action { padding: 8px 20px 12px; display: flex; justify-content: flex-end; }
+.try-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.try-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── YAML PROPERTIES MOCKUP ── */
+.obs-properties { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 0.83rem; }
+.obs-prop-row { display: flex; align-items: flex-start; gap: 12px; padding: 6px 12px; border-bottom: 1px solid var(--border); }
+.obs-prop-row:last-child { border-bottom: none; }
+.obs-prop-key { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; min-width: 72px; padding-top: 2px; }
+.obs-prop-val { color: var(--text); flex: 1; }
+.obs-prop-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <h1>마크다운 완전정복</h1>
+    <p class="header-filename">AI와 효율적으로 대화하는 법 .md</p>
+    <p>Obsidian 입문 가이드 — 문법 레퍼런스 + 직접 연습하기</p>
+    <div class="header-btns">
+      <a href="#guide" class="header-btn btn-primary">문법 레퍼런스 →</a>
+      <a href="#practice" class="header-btn btn-secondary">연습하기 →</a>
+    </div>
+  </div>
+</header>
+
+<!-- GUIDE SECTION -->
+<section id="guide">
+  <div class="container section-wrap">
+    <h2 class="section-title"><span>#</span> 문법 레퍼런스</h2>
+    <p class="section-sub">탭을 클릭해 카테고리별 문법을 확인하세요.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" onclick="switchTab(this,'tab-heading')">제목</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-emphasis')">강조</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-list')">목록</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-link')">링크</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-code')">코드</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-etc')">기타</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-obsidian')">⭐ Obsidian 전용</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-yaml')">YAML 메타데이터</button>
+    </div>
+
+    <!-- 제목 탭 -->
+    <div id="tab-heading" class="tab-panel active">
+      <div class="card">
+        <div class="card-title">제목 크기</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-blue">#</span><span class="s-plain"> 제목 1
+</span><span class="s-blue">##</span><span class="s-plain"> 제목 2
+</span><span class="s-blue">###</span><span class="s-plain"> 제목 3
+</span><span class="s-blue">####</span><span class="s-plain"> 제목 4</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <h1>제목 1</h1>
+              <h2>제목 2</h2>
+              <h3>제목 3</h3>
+              <h4>제목 4</h4>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip"># 개수가 많을수록 작아져요. 논문 노트라면 # 논문제목 → ## 섹션 → ### 소섹션 구조 추천.</div>
+        <div class="card-action"><button class="try-btn" data-example="heading">에디터에서 써보기 →</button></div>
+      </div>
+    </div>
+
+    <!-- 강조 탭 -->
+    <div id="tab-emphasis" class="tab-panel">
+      <div class="card">
+        <div class="card-title">굵게 · 기울임</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-amber">**</span><span class="s-plain">굵게</span><span class="s-amber">**</span><span class="s-plain">
+</span><span class="s-amber">*</span><span class="s-plain">기울임</span><span class="s-amber">*</span><span class="s-plain">
+</span><span class="s-amber">**</span><span class="s-plain">굵게</span><span class="s-amber">**</span><span class="s-plain"> 와 </span><span class="s-amber">*</span><span class="s-plain">기울임</span><span class="s-amber">*</span><span class="s-plain"> 같이</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <p><strong>굵게</strong></p>
+              <p><em>기울임</em></p>
+              <p><strong>굵게</strong> 와 <em>기울임</em> 같이</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">** 2개 = 굵게, * 1개 = 기울임. 밑줄(_)도 동일하게 작동.</div>
+        <div class="card-action"><button class="try-btn" data-example="emphasis-bold">에디터에서 써보기 →</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">취소선 · 하이라이트</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-red">~~</span><span class="s-plain">폐기된 가설</span><span class="s-red">~~</span><span class="s-plain">
+</span><span class="s-amber">==</span><span class="s-plain">핵심 주장</span><span class="s-amber">==</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <p><del>폐기된 가설</del></p>
+              <p><mark>핵심 주장</mark></p>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">==하이라이트==는 Obsidian 전용 문법. 논문 핵심 구절 표시에 유용.</div>
+        <div class="card-action"><button class="try-btn" data-example="emphasis-strike">에디터에서 써보기 →</button></div>
+      </div>
+    </div>
+
+    <!-- 목록 탭 -->
+    <div id="tab-list" class="tab-panel">
+      <div class="card">
+        <div class="card-title">순서없는 · 순서있는 목록</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-blue">-</span><span class="s-plain"> 사과
+</span><span class="s-blue">-</span><span class="s-plain"> 바나나
+  </span><span class="s-blue">-</span><span class="s-plain"> 들여쓰기
+
+</span><span class="s-plain">1</span><span class="s-blue">.</span><span class="s-plain"> 서론
+2</span><span class="s-blue">.</span><span class="s-plain"> 본론
+3</span><span class="s-blue">.</span><span class="s-plain"> 결론</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <ul><li>사과</li><li>바나나<ul><li>들여쓰기</li></ul></li></ul>
+              </div>
+              <div>
+                <ol><li>서론</li><li>본론</li><li>결론</li></ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">Tab(스페이스 2칸)으로 중첩 목록. - 대신 * 나 + 도 가능.</div>
+        <div class="card-action"><button class="try-btn" data-example="list-basic">에디터에서 써보기 →</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">체크박스</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-blue">-</span><span class="s-plain"> </span><span class="s-amber">[ ]</span><span class="s-plain"> 논문 초안 작성
+</span><span class="s-blue">-</span><span class="s-plain"> </span><span class="s-amber">[x]</span><span class="s-plain"> </span><span class="s-red">~~</span><span class="s-plain">선행연구 검토</span><span class="s-red">~~</span><span class="s-plain">
+</span><span class="s-blue">-</span><span class="s-plain"> </span><span class="s-amber">[/]</span><span class="s-plain"> 데이터 수집 중</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <ul style="list-style:none;padding:0;">
+                <li><input type="checkbox" disabled> 논문 초안 작성</li>
+                <li><input type="checkbox" checked disabled> <span class="task-done">선행연구 검토</span></li>
+                <li><input type="checkbox" disabled style="accent-color:#D97706"> <span class="task-inprogress">데이터 수집 중</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">[ ] 미완료 · [x] 완료(자동 취소선) · [/] 진행 중 — [/] 는 Obsidian 확장 문법. 클릭 한 번으로 토글.</div>
+        <div class="card-action"><button class="try-btn" data-example="list-checkbox">에디터에서 써보기 →</button></div>
+      </div>
+    </div>
+
+    <!-- 링크 탭 -->
+    <div id="tab-link" class="tab-panel">
+      <div class="card">
+        <div class="card-title">내부 링크 (Wikilink)</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-green">[[</span><span class="s-plain">연구방법론 노트</span><span class="s-green">]]</span><span class="s-plain">
+</span><span class="s-green">[[</span><span class="s-plain">저자이름</span><span class="s-blue">|</span><span class="s-plain">보이는 텍스트</span><span class="s-green">]]</span><span class="s-plain">
+</span><span class="s-green">[[</span><span class="s-plain">노트이름</span><span class="s-blue">#</span><span class="s-plain">섹션</span><span class="s-green">]]</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <p><span class="obs-wikilink">연구방법론 노트</span></p>
+              <p><span class="obs-wikilink">보이는 텍스트</span></p>
+              <p><span class="obs-wikilink">노트이름 &gt; 섹션</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">[[ 타이핑하면 자동완성! | 로 표시 텍스트 변경, # 으로 섹션 지정.</div>
+        <div class="card-action"><button class="try-btn" data-example="link-internal">에디터에서 써보기 →</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">외부 링크 · 이미지</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-amber">[</span><span class="s-plain">Google Scholar</span><span class="s-amber">]</span><span class="s-green">(https://scholar.google.com)</span><span class="s-plain">
+
+</span><span class="s-red">!</span><span class="s-amber">[</span><span class="s-plain">도표 설명</span><span class="s-amber">]</span><span class="s-green">(figure1.png)</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <p><a href="#">Google Scholar</a></p>
+              <div class="img-placeholder">🖼 <span>도표 설명 (figure1.png)</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">! 를 앞에 붙이면 이미지 삽입.</div>
+        <div class="card-action"><button class="try-btn" data-example="link-external">에디터에서 써보기 →</button></div>
+      </div>
+    </div>
+
+    <!-- 코드 탭 -->
+    <div id="tab-code" class="tab-panel">
+      <div class="card">
+        <div class="card-title">인라인 코드 · 코드 블록</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-red">`</span><span class="s-plain">p &lt; 0.05</span><span class="s-red">`</span><span class="s-plain"> 로 유의했음
+
+</span><span class="s-red">```r</span><span class="s-plain">
+lm(y ~ x, data=df)
+summary(model)
+</span><span class="s-red">```</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <p><code>p &lt; 0.05</code> 로 유의했음</p>
+              <pre><code>lm(y ~ x, data=df)
+summary(model)</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">언어 이름(r, python, stata 등)을 입력하면 문법 색상 강조 적용.</div>
+        <div class="card-action"><button class="try-btn" data-example="code">에디터에서 써보기 →</button></div>
+      </div>
+    </div>
+
+    <!-- 기타 탭 -->
+    <div id="tab-etc" class="tab-panel">
+      <div class="card">
+        <div class="card-title">인용구 · 구분선</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-blue">&gt;</span><span class="s-plain"> 논문 원문을 이렇게
+</span><span class="s-blue">&gt;</span><span class="s-plain"> 인용할 수 있어요.
+
+</span><span class="s-blue">&gt;</span><span class="s-plain"> 재인용할 때는
+</span><span class="s-blue">&gt; &gt;</span><span class="s-plain"> 이렇게 중첩 가능
+
+</span><span class="s-blue">---</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <blockquote>논문 원문을 이렇게<br>인용할 수 있어요.</blockquote>
+              <blockquote>재인용할 때는<blockquote>이렇게 중첩 가능</blockquote></blockquote>
+              <hr>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">&gt; 하나씩 늘릴수록 중첩 인용. --- 는 섹션 구분선.</div>
+        <div class="card-action"><button class="try-btn" data-example="quote">에디터에서 써보기 →</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">표</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-blue">|</span><span class="s-plain"> 저자 </span><span class="s-blue">|</span><span class="s-plain"> 연도 </span><span class="s-blue">|</span><span class="s-plain"> 방법론 </span><span class="s-blue">|</span><span class="s-plain">
+</span><span class="s-blue">|---|---|---|</span><span class="s-plain">
+</span><span class="s-blue">|</span><span class="s-plain"> 홍길동 </span><span class="s-blue">|</span><span class="s-plain"> 2023 </span><span class="s-blue">|</span><span class="s-plain"> 질적 연구 </span><span class="s-blue">|</span><span class="s-plain">
+</span><span class="s-blue">|</span><span class="s-plain"> 김철수 </span><span class="s-blue">|</span><span class="s-plain"> 2024 </span><span class="s-blue">|</span><span class="s-plain"> 양적 연구 </span><span class="s-blue">|</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <table>
+                <thead><tr><th>저자</th><th>연도</th><th>방법론</th></tr></thead>
+                <tbody>
+                  <tr><td>홍길동</td><td>2023</td><td>질적 연구</td></tr>
+                  <tr><td>김철수</td><td>2024</td><td>양적 연구</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">선행연구 비교 표에 딱이에요. |:---:| 가운데, |---:| 오른쪽 정렬.</div>
+        <div class="card-action"><button class="try-btn" data-example="table">에디터에서 써보기 →</button></div>
+      </div>
+    </div>
+
+    <!-- Obsidian 전용 탭 -->
+    <div id="tab-obsidian" class="tab-panel">
+      <div class="card">
+        <div class="card-title">#태그</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-green">#연구방법론</span><span class="s-plain"> </span><span class="s-green">#참고문헌</span><span class="s-plain">
+</span><span class="s-green">#읽는중</span><span class="s-plain"> </span><span class="s-green">#중요</span><span class="s-plain"> </span><span class="s-green">#재검토</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <p>
+                <span class="md-tag">#연구방법론</span>
+                <span class="md-tag">#참고문헌</span>
+                <span class="md-tag">#읽는중</span>
+                <span class="md-tag">#중요</span>
+                <span class="md-tag">#재검토</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">한글 태그 가능. #읽는중 #완독 #인용예정 으로 논문 상태 관리.</div>
+        <div class="card-action"><button class="try-btn" data-example="obs-tag">에디터에서 써보기 →</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">파일 임베드</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-red">!</span><span class="s-green">[[</span><span class="s-plain">연구방법 노트</span><span class="s-green">]]</span><span class="s-plain">
+</span><span class="s-red">!</span><span class="s-green">[[</span><span class="s-plain">figure1.png</span><span class="s-green">]]</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <div class="obs-embed-box">📄 연구방법 노트</div>
+              <div class="obs-embed-box">🖼 figure1.png</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">! 를 [[]] 앞에 붙이면 다른 노트 전체 또는 이미지를 현재 노트에 삽입.</div>
+        <div class="card-action"><button class="try-btn" data-example="obs-embed">에디터에서 써보기 →</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">콜아웃 (Callout)</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-blue">&gt;</span><span class="s-plain"> </span><span class="s-green">[!NOTE]</span><span class="s-plain"> 참고할 내용
+</span><span class="s-blue">&gt;</span><span class="s-plain"> 본문은 여기에
+
+</span><span class="s-blue">&gt;</span><span class="s-plain"> </span><span class="s-green">[!TIP]</span><span class="s-plain"> 유용한 팁
+
+</span><span class="s-blue">&gt;</span><span class="s-plain"> </span><span class="s-green">[!WARNING]</span><span class="s-plain"> 주의사항
+
+</span><span class="s-blue">&gt;</span><span class="s-plain"> </span><span class="s-green">[!DANGER]</span><span class="s-plain"> 위험 · 오류
+
+</span><span class="s-blue">&gt;</span><span class="s-plain"> </span><span class="s-green">[!NOTE]</span><span class="s-plain"> </span><span class="s-amber">나만의 제목</span><span class="s-plain">
+</span><span class="s-blue">&gt;</span><span class="s-plain"> 커스텀 제목 가능</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">결과</div>
+            <div class="rendered">
+              <div class="callout callout-note"><div class="callout-title">ℹ️ NOTE</div><div class="callout-body">참고할 내용 — 본문은 여기에</div></div>
+              <div class="callout callout-tip"><div class="callout-title">💡 TIP</div><div class="callout-body">유용한 팁 · 성공</div></div>
+              <div class="callout callout-warning"><div class="callout-title">⚠️ WARNING</div><div class="callout-body">주의사항</div></div>
+              <div class="callout callout-danger"><div class="callout-title">🚨 DANGER</div><div class="callout-body">위험 · 오류</div></div>
+              <div class="callout callout-note"><div class="callout-title">ℹ️ 나만의 제목</div><div class="callout-body">커스텀 제목 가능</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">타입 4종: NOTE·INFO(파랑) / TIP·SUCCESS(초록) / WARNING(노랑) / DANGER(빨강). [!타입] 뒤에 띄어쓰기 후 제목 직접 입력 가능.</div>
+        <div class="card-action"><button class="try-btn" data-example="obs-callout">에디터에서 써보기 →</button></div>
+      </div>
+    </div>
+
+    <!-- YAML 메타데이터 탭 -->
+    <div id="tab-yaml" class="tab-panel">
+      <div class="card">
+        <div class="card-title">기본 메타데이터</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-amber">---</span><span class="s-plain">
+</span><span class="s-blue">title</span><span class="s-plain">: 연구방법론 정리
+</span><span class="s-blue">date</span><span class="s-plain">: 2024-01-15
+</span><span class="s-blue">author</span><span class="s-plain">: 홍길동
+</span><span class="s-blue">status</span><span class="s-plain">: 작성중
+</span><span class="s-amber">---</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">Obsidian 속성 패널</div>
+            <div class="obs-properties">
+              <div class="obs-prop-row"><span class="obs-prop-key">title</span><span class="obs-prop-val">연구방법론 정리</span></div>
+              <div class="obs-prop-row"><span class="obs-prop-key">date</span><span class="obs-prop-val">2024-01-15</span></div>
+              <div class="obs-prop-row"><span class="obs-prop-key">author</span><span class="obs-prop-val">홍길동</span></div>
+              <div class="obs-prop-row"><span class="obs-prop-key">status</span><span class="obs-prop-val">작성중</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">파일 최상단 --- 사이에 작성. Obsidian 4.x부터 그래픽 속성 편집 가능.</div>
+        <div class="card-action"><button class="try-btn" data-example="yaml-basic">에디터에서 써보기 →</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">태그 · 별칭 (tags / aliases)</div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="panel-label">문법</div>
+            <div class="syn"><span class="s-amber">---</span><span class="s-plain">
+</span><span class="s-blue">tags</span><span class="s-plain">:
+  </span><span class="s-green">- 연구방법론
+  - 질적연구
+  - 논문
+</span><span class="s-blue">aliases</span><span class="s-plain">:
+  </span><span class="s-green">- 방법론 노트
+  - 연구방법</span><span class="s-plain">
+</span><span class="s-amber">---</span></div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-right">
+            <div class="panel-label">Obsidian 속성 패널</div>
+            <div class="obs-properties">
+              <div class="obs-prop-row">
+                <span class="obs-prop-key">tags</span>
+                <span class="obs-prop-val"><div class="obs-prop-tags"><span class="md-tag">#연구방법론</span><span class="md-tag">#질적연구</span><span class="md-tag">#논문</span></div></span>
+              </div>
+              <div class="obs-prop-row">
+                <span class="obs-prop-key">aliases</span>
+                <span class="obs-prop-val">방법론 노트, 연구방법</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-tip">aliases에 등록한 이름으로도 [[ ]] 자동완성 가능. tags는 그래프 뷰와 검색에 연결.</div>
+        <div class="card-action"><button class="try-btn" data-example="yaml-tags">에디터에서 써보기 →</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE EDITOR SECTION -->
+<section id="practice" style="background: linear-gradient(to bottom, var(--bg), #EDE9FF22);">
+  <div class="container" style="padding-top:24px;padding-bottom:80px;">
+    <h2 class="section-title"><span>#</span> 직접 연습하기</h2>
+    <p class="section-sub">왼쪽에 마크다운을 입력하면 오른쪽에 실시간으로 렌더링됩니다.</p>
+
+    <div class="editor-wrap">
+      <div class="editor-pane">
+        <div class="pane-header"><span class="pane-dot dot-edit"></span>마크다운 입력</div>
+        <textarea id="md-input" spellcheck="false"></textarea>
+      </div>
+      <div class="editor-divider">→</div>
+      <div class="preview-pane">
+        <div class="pane-header"><span class="pane-dot dot-preview"></span>렌더링 결과</div>
+        <div id="md-preview" class="rendered"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:28px 20px;color:var(--text-muted);font-size:0.82rem;border-top:1px solid var(--border);">
+  마크다운 완전정복 · Obsidian 입문 가이드 · marked.js 기반 라이브 에디터
+</footer>
+
+<script>
+// ── TAB SWITCHING ──
+function switchTab(btn, panelId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── OBSIDIAN PREPROCESSOR ──
+function preprocessObsidian(md) {
+  // 0. [/] in-progress tasks (Obsidian extension, not standard GFM)
+  md = md.replace(/^([ \t]*)- \[\/\] (.+)$/gm, (_, indent, content) =>
+    `${indent}- <input type="checkbox" disabled style="accent-color:#D97706"> <span class="task-inprogress">${content}</span>`);
+
+  // 1. Callouts: > [!TYPE] optional title\n> content (multiline)
+  md = md.replace(/^((?:> \[!(\w+)\][^\n]*\n(?:> [^\n]*\n?)*)+)/gm, function(match) {
+    const lines = match.split('\n');
+    const firstLine = lines[0];
+    const typeMatch = firstLine.match(/> \[!(\w+)\]\s*(.*)/);
+    if (!typeMatch) return match;
+    const type = typeMatch[1].toLowerCase();
+    const title = typeMatch[2].trim() || typeMatch[1].toUpperCase();
+    const icons = { note:'ℹ️', info:'ℹ️', tip:'💡', success:'✅', warning:'⚠️', danger:'🚨' };
+    const icon = icons[type] || 'ℹ️';
+    const bodyLines = lines.slice(1).filter(l => l.startsWith('> ')).map(l => l.slice(2)).join('\n');
+    return `<div class="callout callout-${type}"><div class="callout-title">${icon} ${title}</div><div class="callout-body">${bodyLines}</div></div>`;
+  });
+
+  // 2. Highlight ==text==
+  md = md.replace(/==([^=\n]+)==/g, '<mark>$1</mark>');
+
+  // 3. File embed ![[filename]]
+  md = md.replace(/!\[\[([^\]]+)\]\]/g, '<span class="obs-embed-box">📄 $1</span>');
+
+  // 4. Wikilinks [[note|alias]] and [[note]]
+  md = md.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, '<span class="obs-wikilink">$2</span>');
+  md = md.replace(/\[\[([^\]]+)\]\]/g, '<span class="obs-wikilink">$1</span>');
+
+  // 5. Tags #tag (Korean/English, not at start of line where it'd be a heading)
+  md = md.replace(/(^|\s)(#[\w가-힣ㄱ-ㅎㅏ-ㅣ]+)/g, function(m, before, tag) {
+    return before + `<span class="md-tag">${tag}</span>`;
+  });
+
+  return md;
+}
+
+// ── MARKED CONFIG ──
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
+
+// Custom renderer for checkboxes (marked v9 API: receives token object)
+const renderer = new marked.Renderer();
+renderer.listitem = function(token) {
+  const task = token.task;
+  const checked = token.checked;
+  let body;
+  if (this.parser && token.tokens) {
+    body = this.parser.parse(token.tokens, !!token.loose);
+    body = body.replace(/^<p>([\s\S]*?)<\/p>\n?$/, '$1');
+  } else {
+    body = typeof token === 'string' ? token : (token.text || '');
+  }
+  if (task) {
+    if (checked) {
+      return `<li style="list-style:none"><input type="checkbox" checked disabled> <span class="task-done">${body}</span></li>\n`;
+    }
+    return `<li style="list-style:none"><input type="checkbox" disabled> ${body}</li>\n`;
+  }
+  return `<li>${body}</li>\n`;
+};
+
+// ── RENDER FUNCTION ──
+function renderMarkdown(md) {
+  const processed = preprocessObsidian(md);
+  try {
+    return marked.parse(processed, { renderer });
+  } catch(e) {
+    return marked.parse(processed);
+  }
+}
+
+// ── DEBOUNCE ──
+function debounce(fn, ms) {
+  let t;
+  return function(...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), ms); };
+}
+
+// ── INITIAL CONTENT ──
+const initialMd = `# 마크다운 연습하기
+
+## 기본 강조
+
+**굵게** 쓸 때는 별표 두 개, *기울임*은 하나.
+~~취소선~~과 ==하이라이트==도 써보세요.
+
+## 목록
+
+- 순서없는 목록
+- 이렇게 작성해요
+  - 들여쓰기도 가능
+
+1. 순서있는 목록
+2. 자동으로 번호가 매겨져요
+
+- [ ] 할 일 목록
+- [x] 완료된 항목
+
+## 코드
+
+인라인 코드는 \`이렇게\` 쓰고,
+
+\`\`\`python
+def hello():
+    print("Hello, Markdown!")
+\`\`\`
+
+## 링크
+
+외부 링크: [Google Scholar](https://scholar.google.com)
+내부 링크: [[연구방법론 노트]]
+
+#마크다운 #공부 #Obsidian
+
+## 인용구
+
+> 논문 원문을 이렇게 인용할 수 있어요.
+
+---
+
+## 콜아웃
+
+> [!NOTE]
+> 참고할 내용을 이렇게 강조해요.
+
+> [!WARNING]
+> 주의해야 할 내용은 이렇게요.
+
+## 표
+
+| 저자 | 연도 | 방법론 |
+|---|---|---|
+| 홍길동 | 2023 | 질적 연구 |
+| 김철수 | 2024 | 양적 연구 |
+`;
+
+const textarea = document.getElementById('md-input');
+const preview = document.getElementById('md-preview');
+
+textarea.value = initialMd;
+preview.innerHTML = renderMarkdown(initialMd);
+
+const update = debounce(() => {
+  preview.innerHTML = renderMarkdown(textarea.value);
+}, 80);
+
+textarea.addEventListener('input', update);
+
+// Tab key → 2 spaces
+textarea.addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
+    this.value = this.value.slice(0, start) + '  ' + this.value.slice(end);
+    this.selectionStart = this.selectionEnd = start + 2;
+    update();
+  }
+});
+
+// ── EXAMPLES & TRY BUTTON ──
+const examples = {
+  'heading':
+    `# 제목 1\n## 제목 2\n### 제목 3\n#### 제목 4`,
+  'emphasis-bold':
+    `**굵게** 강조하고 *기울임*도 써보세요.\n\n_밑줄로도_ **두 가지**를 *같이* 쓸 수 있어요.`,
+  'emphasis-strike':
+    `~~폐기된 가설~~\n\n==핵심 주장은 이렇게 하이라이트==\n\n~~삭제~~와 ==강조==를 같이 써보세요.`,
+  'list-basic':
+    `- 사과\n- 바나나\n  - 들여쓰기된 항목\n  - 두 번째 하위 항목\n- 체리\n\n1. 서론\n2. 본론\n3. 결론`,
+  'list-checkbox':
+    `- [ ] 논문 초안 작성\n- [x] 선행연구 검토\n- [/] 데이터 수집 중\n- [ ] 분석 완료`,
+  'link-internal':
+    `[[연구방법론 노트]]\n\n[[홍길동 2023|홍길동 (2023)]]\n\n[[연구방법론 노트#질적연구]]`,
+  'link-external':
+    `[Google Scholar](https://scholar.google.com)\n\n![도표 설명](figure1.png)`,
+  'code':
+    "인라인 코드: \`p < 0.05\` 로 유의했음\n\n\`\`\`r\nlm(y ~ x, data = df)\nsummary(model)\n\`\`\`\n\n\`\`\`python\nimport pandas as pd\ndf = pd.read_csv('data.csv')\nprint(df.describe())\n\`\`\`",
+  'quote':
+    `> 논문 원문을 이렇게\n> 인용할 수 있어요.\n\n---\n\n구분선 아래는 새 섹션이에요.`,
+  'table':
+    `| 저자 | 연도 | 방법론 |\n|---|---|---|\n| 홍길동 | 2023 | 질적 연구 |\n| 김철수 | 2024 | 양적 연구 |`,
+  'obs-tag':
+    `#연구방법론 #참고문헌 #읽는중\n\n이 논문은 #중요 해서 #인용예정 으로 분류했어요.`,
+  'obs-embed':
+    `![[연구방법 노트]]\n\n![[figure1.png]]`,
+  'obs-callout':
+    `> [!NOTE]\n> 참고할 내용을 이렇게 강조해요.\n\n> [!TIP]\n> 유용한 팁은 이 타입으로.\n\n> [!WARNING]\n> 주의해야 할 내용이에요.\n\n> [!DANGER]\n> 위험하거나 중요한 경고.\n\n> [!NOTE] 나만의 제목\n> 타입 뒤에 제목을 직접 쓸 수 있어요.`,
+  'yaml-basic':
+    `---\ntitle: 연구방법론 정리\ndate: 2024-01-15\nauthor: 홍길동\nstatus: 작성중\n---\n\n# 본문 시작\n\nFront matter는 파일 최상단에 위치해요.`,
+  'yaml-tags':
+    `---\ntags:\n  - 연구방법론\n  - 질적연구\n  - 논문\naliases:\n  - 방법론 노트\n  - 연구방법\n---\n\n# 본문 시작\n\naliases로 지정한 이름으로도 [[방법론 노트]]처럼 링크 가능해요.`,
+};
+
+function tryExample(key) {
+  if (!examples[key]) return;
+  textarea.value = examples[key];
+  preview.innerHTML = renderMarkdown(textarea.value);
+  document.getElementById('practice').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  textarea.style.background = 'var(--accent-light)';
+  setTimeout(() => { textarea.style.background = ''; }, 700);
+}
+
+document.querySelectorAll('.try-btn').forEach(btn => {
+  btn.addEventListener('click', () => tryExample(btn.dataset.example));
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
