@@ -7,7 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script src="marked.min.js"></script>
+<script src="purify.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -812,6 +813,13 @@ function switchTab(btn, panelId) {
 
 // ── OBSIDIAN PREPROCESSOR ──
 function preprocessObsidian(md) {
+  // 코드 펜스/인라인 코드를 잠시 빼둠 → 내부에서 옵시디언 문법(==, #tag, [[..]])이 오작동하지 않도록
+  const codeStore = [];
+  const stash = (s) => { codeStore.push(s); return '' + (codeStore.length - 1) + ''; };
+  md = md.replace(/```[\s\S]*?```/g, stash);   // ``` 코드 블록
+  md = md.replace(/~~~[\s\S]*?~~~/g, stash);   // ~~~ 코드 블록
+  md = md.replace(/`[^`\n]+`/g, stash);        // 인라인 코드
+
   // 0. [/] in-progress tasks (Obsidian extension, not standard GFM)
   md = md.replace(/^([ \t]*)- \[\/\] (.+)$/gm, (_, indent, content) =>
     `${indent}- <input type="checkbox" disabled style="accent-color:#D97706"> <span class="task-inprogress">${content}</span>`);
@@ -826,8 +834,11 @@ function preprocessObsidian(md) {
     const title = typeMatch[2].trim() || typeMatch[1].toUpperCase();
     const icons = { note:'ℹ️', info:'ℹ️', tip:'💡', success:'✅', warning:'⚠️', danger:'🚨' };
     const icon = icons[type] || 'ℹ️';
-    const bodyLines = lines.slice(1).filter(l => l.startsWith('> ')).map(l => l.slice(2)).join('\n');
-    return `<div class="callout callout-${type}"><div class="callout-title">${icon} ${title}</div><div class="callout-body">${bodyLines}</div></div>`;
+    let body = lines.slice(1).filter(l => l.startsWith('> ')).map(l => l.slice(2)).join('\n');
+    body = body.replace(/==([^=\n]+)==/g, '<mark>$1</mark>');
+    // 콜아웃 내부의 마크다운(굵게·링크·목록 등)도 렌더
+    try { if (typeof marked !== 'undefined') body = marked.parse(body); } catch(e) {}
+    return `<div class="callout callout-${type}"><div class="callout-title">${icon} ${title}</div><div class="callout-body">${body}</div></div>\n`;
   });
 
   // 2. Highlight ==text==
@@ -845,18 +856,18 @@ function preprocessObsidian(md) {
     return before + `<span class="md-tag">${tag}</span>`;
   });
 
+  // 빼두었던 코드 복원
+  md = md.replace(/(\d+)/g, (_, i) => codeStore[+i]);
   return md;
 }
 
 // ── MARKED CONFIG ──
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-});
+const LIBS_READY = (typeof marked !== 'undefined');
+if (LIBS_READY) marked.setOptions({ gfm: true, breaks: true });
 
 // Custom renderer for checkboxes (marked v9 API: receives token object)
-const renderer = new marked.Renderer();
-renderer.listitem = function(token) {
+const renderer = LIBS_READY ? new marked.Renderer() : null;
+if (renderer) renderer.listitem = function(token) {
   const task = token.task;
   const checked = token.checked;
   let body;
@@ -877,12 +888,21 @@ renderer.listitem = function(token) {
 
 // ── RENDER FUNCTION ──
 function renderMarkdown(md) {
-  const processed = preprocessObsidian(md);
-  try {
-    return marked.parse(processed, { renderer });
-  } catch(e) {
-    return marked.parse(processed);
+  if (!LIBS_READY) {
+    return '<p style="color:#B91C1C;font-weight:600">⚠️ 마크다운 엔진(marked.min.js)을 불러오지 못했습니다.<br>marked.min.js 파일이 이 HTML과 같은 폴더에 있는지 확인하세요.</p>';
   }
+  const processed = preprocessObsidian(md);
+  let html;
+  try {
+    html = marked.parse(processed, { renderer });
+  } catch(e) {
+    html = marked.parse(processed);
+  }
+  // XSS 방지: 렌더링된 HTML을 DOMPurify로 살균 (script/onerror/javascript: 제거)
+  if (typeof DOMPurify !== 'undefined') {
+    html = DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
+  }
+  return html;
 }
 
 // ── DEBOUNCE ──
